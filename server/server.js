@@ -23,7 +23,9 @@ rollbar.log('Hello world!')
 let students = []
 
 app.post('/api/student', (req, res)=>{
+    rollbar.log("Hi,Scott")
     let {name} = req.body
+
     name = name.trim()
 
     const index = students.findIndex(studentName=> studentName === name)
