@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, '../public')))
 
 const Rollbar = require('rollbar')
 const rollbar = new Rollbar({
-  accessToken: '0eac6c2b530e417b80559513559d3b10',
+  accessToken: 'ec7e8a99f5cd41ae93b6b10c5d37ddbe',
   captureUncaught: true,
   captureUnhandledRejections: true,
 })
