@@ -19,9 +19,10 @@ const rollbar = new Rollbar({
 
 // record a generic message and send it to Rollbar
 rollbar.log('Hello world!')
-
+Rollbar.critical("Crash while processing payment");
+Rollbar.warning("Facebook API unavailable");
 
 
 const port = process.env.PORT || 4545
-// app.use(rollbar.errorHandler())
+app.use(rollbar.errorHandler())
 app.listen(port, ()=>{ console.log(`take us to warp ${port}`)})
