@@ -9,40 +9,45 @@
     <title>Document</title>
 </head>
 <body>
-    <main>
-        <h1>Nine-Nine!</h1>
-    
-        <button id="all">Get All Characters</button>
-        <button class="char-btns" id="jake">Get Jake</button>
-        <button class="char-btns" id="amy">Get Amy</button>
-        <button class="char-btns" id="rosa">Get Rosa</button>
-        <button class="char-btns" id="charles">Get Charles</button>
-    
-        <h2>Get characters older than...</h2>
-        <form id="age-form">
-            <input type="text" placeholder="What's the age limit?" id="age-input"/>
-            <button>Get Old Characters</button>
-        </form>
-    
-        <h2>Create a New Character</h2>
-        <form id="create-form">
-            <input type="text" id="first" placeholder="First Name"/>
-            <input type="text" id="last" placeholder="Last Name"/>
-            <select>
-                <option value="female">female</option>
-                <option value="male">male</option>
-                <option value="nonbinary">non-binary</option>
-            </select>
-            <input type="number" id="age" placeholder="age"/>
-            <label for="likes">List likes separated by commas (limit 3):</label>
-            <textarea id="likes"></textarea>
-            <button>add new character</button>
-        </form>
-        </main>
-    
-        <section></section>
-    
-        
-        <script src="index.js"></script>
+    <h1>Student List</h1>
+    <form>
+        <input type="text" placeholder="Type name here"/>
+        <button>Add Student</button>
+    </form>
+    <section></section>
+    <script>
+        const addForm = document.querySelector('form')
+        const nameInput = document.querySelector('input')
+        const container = document.querySelector('section')
+
+        function submitHandler(e){
+            e.preventDefault()
+            axios.post('/api/student', {name: nameInput.value, })
+                .then(res => {
+                    container.innerHTML = ''
+                    nameInput.value = ''
+
+                    res.data.forEach(studentName => {
+                        container.innerHTML += `<p>${studentName}</p>`
+                    })
+                })
+                .catch(err => {
+                    nameInput.value = ''
+
+                    const notif = document.createElement('aside')
+                    notif.innerHTML = `<p>${err.response.data}</p>
+                    <button class='close'>close</button>`
+                    document.body.appendChild(notif)
+
+                    document.querySelectorAll('.close').forEach(btn => {
+                        btn.addEventListener('click', (e)=>{
+                            e.target.parentNode.remove()
+                        })
+                    })
+                })
+        }
+
+        addForm.addEventListener('submit', submitHandler)
+    </script>
 </body>
 </html>

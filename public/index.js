@@ -1,105 +1,61 @@
-const getAllBtn = document.querySelector('#all')
-const charBtns = document.querySelectorAll('.char-btns')
-const ageForm = document.querySelector('#age-form')
-const ageInput = document.querySelector('#age-input')
-const createForm = document.querySelector('#create-form')
-const newFirstInput = document.querySelector('#first')
-const newLastInput = document.querySelector('#last')
-const newGenderDropDown = document.querySelector('select')
-const newAgeInput = document.querySelector('#age')
-const newLikesText = document.querySelector('textarea')
-const charContainer = document.querySelector('section')
+const moviesContainer = document.querySelector('#movies-container')
+const form = document.querySelector('form')
 
-const baseURL = 'http://localhost:4545'
+const baseURL = `http://localhost:4545/api/movies`
 
-function createCharacterCard(char) {
-  let charCard = document.createElement('div')
-  charCard.innerHTML = `<h3>${char.firstName} ${char.lastName}</h3>
-  <p>gender: ${char.gender} | age: ${char.age}</p>
-  <h4>Likes</h4>
-  <ul>
-    <li>${char.likes[0]}</li>
-    <li>${char.likes[1]}</li>
-    <li>${char.likes[2]}</li>
-  </ul>`
+const moviesCallback = ({ data: movies }) => displayMovies(movies)
+const errCallback = err => console.log(err.response.data)
 
-  charContainer.appendChild(charCard)
-}
+const getAllMovies = () => axios.get(baseURL).then(moviesCallback).catch(errCallback)
+const createMovie = body => axios.post(baseURL, body).then(moviesCallback).catch(errCallback)
+const deleteMovie = id => axios.delete(`${baseURL}/${id}`).then(moviesCallback).catch(errCallback)
+const updateMovie = (id, type) => axios.put(`${baseURL}/${id}`, {type}).then(moviesCallback).catch(errCallback)
 
-function clearCharacters() {
-  charContainer.innerHTML = ``
-}
-const getAllCharacters = () =>{
-  clearCharacters()
+function submitHandler(e) {
+    e.preventDefault()
 
-  axios.get(`${baseURL}/characters`)
-  .then((response) => {
-    for( let i = 0; i < response.data.length; i++){
-      console.log()
-      createCharacterCard(response.data[i])
-    }
-  })
-  .catch(error => console.log(error))
-}
+    let title = document.querySelector('#title')
+    let rating = document.querySelector('input[name="ratings"]:checked')
+    let imageURL = document.querySelector('#img')
 
-const getOneCharacter = () =>{
-  clearCharacters()
-  axios.get(`${baseURL}/character/${event.target.id}`)
-  .then(response => {
-    console.log("get on character: ", id)
-    createCharacterCard(response.data)
-  })
-  .catch(error => console.log(error))
-}
-
-const getOldChars = (event) =>{
-event.preventDefault()
-
-  clearCharacters()
-  axios.get(`${baseURL}/character/?age=${ageInput.value}`)
-  .then(res => {
-    for( let i = 0; i < res.data.length; i++){
-      createCharacterCard(res.data[i])
-    }
-  })
-  .catch(error => console.log(error))
-  ageInput.value = ''
-}
-
-const createNewChar = (event) =>{
-  event.preventDefault()
-  clearCharacters()
-
-  const newLikes = [...newLikesText.value.trim().split(',')]
-
-  let body = {
-    firstName: newFirstInput.value,
-    lastName: newLastInput.value,
-    gender: newGenderDropDown.value,
-    age: newAgeInput.value,
-    likes: newLikes
-  }
-  axios.post(`${baseURL}/character`, body)
-  .then(res => {
-    for( let i = 0; i < res.data.length; i++){
-      createCharacterCard(res.data[i])
+    let bodyObj = {
+        title: title.value,
+        rating: rating.value, 
+        imageURL: imageURL.value
     }
 
-  })
-  .catch(error => console.log(error))
+    createMovie(bodyObj)
 
-  newFirstInput.value = ''
-  newLastInput.value = ''
-  newGenderDropDown.value = 'female'
-  newAgeInput.value = ''
-  newLikesText.value = ''
+    title.value = ''
+    rating.checked = false
+    imageURL.value = ''
 }
 
+function createMovieCard(movie) {
+    const movieCard = document.createElement('div')
+    movieCard.classList.add('movie-card')
 
-for(let i = 0; i < charBtns.length; i++){
-  charBtns[i].addEventListener('click', getOneCharacter)
+    movieCard.innerHTML = `<img alt='movie cover' src=${movie.imageURL} class="movie-cover"/>
+    <p class="movie-title">${movie.title}</p>
+    <div class="btns-container">
+        <button onclick="updateMovie(${movie.id}, 'minus')">-</button>
+        <p class="movie-rating">${movie.rating} stars</p>
+        <button onclick="updateMovie(${movie.id}, 'plus')">+</button>
+    </div>
+    <button onclick="deleteMovie(${movie.id})">delete</button>
+    `
+
+
+    moviesContainer.appendChild(movieCard)
 }
-getAllBtn.addEventListener('click', getAllCharacters)
-ageForm.addEventListener('submit', getOldChars)
-getAllCharacters()
-createForm.addEventListener('submit', createNewChar)
+
+function displayMovies(arr) {
+    moviesContainer.innerHTML = ``
+    for (let i = 0; i < arr.length; i++) {
+        createMovieCard(arr[i])
+    }
+}
+
+form.addEventListener('submit', submitHandler)
+
+getAllMovies()
