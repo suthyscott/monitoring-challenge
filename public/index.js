@@ -10,6 +10,8 @@ const newAgeInput = document.querySelector('#age')
 const newLikesText = document.querySelector('textarea')
 const charContainer = document.querySelector('section')
 
+const baseURL = 'http://localhost:4545'
+
 function createCharacterCard(char) {
   let charCard = document.createElement('div')
   charCard.innerHTML = `<h3>${char.firstName} ${char.lastName}</h3>

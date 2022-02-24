@@ -75,22 +75,28 @@ app.get('/character/:name', (req, res) => {
 app.get('/character', (req, res) => {
     const { age } = req.query
     console.log("age")
+    if(age === ''){
+        Rollbar.warning("no age given")
+        res.status(400).send('must provide an age.')
+    }
+    else{
     let filtered = characters.filter(char => {
         return char.age > age
     })
 
     res.status(200).send(filtered)
+    }
 })
 
-app.get('/character', (req, res) => {
-    const { age } = req.query
-    console.log("age")
-    let filtered = characters.filter(char => {
-        return char.age > age
-    })
+// app.get('/character', (req, res) => {
+//     const { age } = req.query
+//     console.log("age")
+//     let filtered = characters.filter(char => {
+//         return char.age > age
+//     })
 
-    res.status(200).send(filtered)
-})
+//     res.status(200).send(filtered)
+// })
 
 let id = 4
 
@@ -98,6 +104,7 @@ app.post('/character', (req, res) => {
     let newChar = {...req.body, id}
     newChar.likes = newChar.likes.slice(0, 3)
     characters.unshift(newChar)
+    rollbar.log("successfully")
     res.status(200).send(characters)
     id++
 })
